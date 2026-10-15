@@ -304,7 +304,7 @@ export const SubjectDetail: React.FC<SubjectDetailProps> = ({
         {/* Row 1: Status Filter Pills + Search + Add Category */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Status Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
             <button
               type="button"
               onClick={() => setFilterStatus('all')}
@@ -382,7 +382,7 @@ export const SubjectDetail: React.FC<SubjectDetailProps> = ({
         </div>
 
         {/* Row 2: Category Filter Selector (Chips/Bar) */}
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto text-xs pb-1">
+        <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-2 text-xs">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 shrink-0 mr-1">
             <Filter className="w-3 h-3" />
             Category:
