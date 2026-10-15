@@ -1,0 +1,81 @@
+{
+  "title": "Ontwikkeling Scrum Teamleden (Dynamics 365 Platform)",
+  "description": "Vaardigheden- en groeiplan voor scrum teamleden die een Microsoft Dynamics 365 / Power Platform omgeving beheren en doorontwikkelen bij een klantorganisatie.",
+  "categories": [
+    {
+      "name": "Stakeholder Management & Adviesvaardigheden",
+      "aspects": [
+        "Verwachtingen managen van veeleisende stakeholders over haalbaarheid en doorlooptijd",
+        "Constructief 'nee' leren zeggen door alternatieven binnen de standaard aan te dragen",
+        "Effectief en tijdig escaleren van impediments en functionele tegenstrijdigheden",
+        "Spreken van de taal van business stakeholders in plaats van Dynamics jargon",
+        "Vertalen van strategische organisatiedoelen naar concrete platform-oplossingen",
+        "Samenwerken met de Product Owner bij het formuleren van backlog prioriteiten"
+      ]
+    },
+    {
+      "name": "Domein- en Bedrijfsproceskennis",
+      "aspects": [
+        "Doorgronden van de end-to-end primaire bedrijfsprocessen van de klant",
+        "Kennis van branchespecifieke wet- en regelgeving, compliance en bewaartermijnen",
+        "Begrip van upstream en downstream applicaties in het IT-landschap van de klant",
+        "Inzicht in de financiële impact en operationele knelpunten van bedrijfsprocessen",
+        "Actief bijhouden van veranderingen in de organisatie- en afdelingsstructuur",
+        "Analyseren hoe data door verschillende afdelingen stroomt en wordt overgedragen"
+      ]
+    },
+    {
+      "name": "Functionele Architectuur & Dynamics 365 Patronen",
+      "aspects": [
+        "Beheersen van het 'Out-of-the-Box first' principe vs maatwerk plugins/code",
+        "Fundamenteel begrip van het Dynamics datamodel (Dataverse tabellen, relaties en cascade regels)",
+        "Inrichten van een veilig en schaalbaar beveiligingsmodel (Business Units, rollen, teams)",
+        "Toepassen van no-code/low-code automatiseringspatronen (Power Automate cloud flows vs business rules)",
+        "Herkennen van functionele anti-patterns (bijv. overmatig customizen van standaard entiteiten)",
+        "Begrip van Dynamics integratiepatronen (Dual-Write, Virtual Tables, webhooks, REST APIs)"
+      ]
+    },
+    {
+      "name": "Gebruikersonderzoek, Empathie & Requirement Engineering",
+      "aspects": [
+        "Actief observeren van eindgebruikers op de werkvloer (shadowing & contextual inquiry)",
+        "Faciliteren van interactieve requirement- en refinementworkshops met gebruikers",
+        "Scherp formuleren van acceptatiecriteria en user stories vanuit het gebruikersperspectief",
+        "Evalueren van gebruiksgemak en ergonomie (aantal clicks, formulierindeling, navigatie)",
+        "Gestructureerd ophalen en categoriseren van gebruikersfeedback na livegang",
+        "Inschatten van weerstand bij veranderingen en formuleren van adoptiemaatregelen"
+      ]
+    },
+    {
+      "name": "Scrum Samenwerking, Ownership & T-Shaped Ontwikkeling",
+      "aspects": [
+        "Ontwikkelen van een T-shaped profiel (verbreding in testen, analyse en configuratie)",
+        "Gezamenlijk ownership nemen over het Sprintdoel in plaats van individuele taken",
+        "Actieve en constructieve participatie in retrospectives met concrete verbeteracties",
+        "Effectieve peer reviews uitvoeren op configuraties, flows en documentatie",
+        "Samen sparren en 'mob programming/configuring' toepassen bij complexe vraagstukken",
+        "Zelfstandig dependencies identificeren en vroegtijdig afstemmen met andere teams"
+      ]
+    },
+    {
+      "name": "Platformbeheer, Kwaliteit & Release Governance",
+      "aspects": [
+        "Kennis van Application Lifecycle Management (ALM) en Dynamics Solution management",
+        "Onderhouden en uitvoeren van gestructureerde regressietests (geautomatiseerd of handmatig)",
+        "Analyseren van de impact van Microsoft Wave releases op klant-aanpassingen",
+        "Grondige Root Cause Analysis (RCA) uitvoeren bij terugkerende incidenten en bugs",
+        "Documenteren van functionele configuraties en besluitvorming (Architectural Decision Records)"
+      ]
+    },
+    {
+      "name": "Innovatie, Adoptie & Proactief Klantadvies",
+      "aspects": [
+        "Verkennen van nieuwe Microsoft Power Platform & Copilot AI mogelijkheden voor de klant",
+        "Proactief signaleren van procesverbeteringen en efficiëntiekansen vanuit systeemdata",
+        "Ondersteunen van key-users bij gebruikerstrainingen en het maken van instructiemateriaal",
+        "Monitoren van platform-adoptie en gebruikersstatistieken via telemetry en Power BI",
+        "Klant inspireren met showcases van best practices uit de bredere Dynamics community"
+      ]
+    }
+  ]
+}
