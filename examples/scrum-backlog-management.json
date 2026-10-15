@@ -1,0 +1,76 @@
+{
+  "title": "Scrum Backlog Management",
+  "description": "Comprehensive framework for structuring, prioritizing, refining, and maintaining a high-value Scrum product backlog.",
+  "categories": [
+    {
+      "name": "Backlog Structuring & Item Hierarchy",
+      "aspects": [
+        "Epics, Features, and User Stories decomposition hierarchy",
+        "Applying the INVEST criteria to create independent and testable stories",
+        "Formulating unambiguous Acceptance Criteria using Given/When/Then (Gherkin)",
+        "Vertical user story slicing techniques (workflow, business rule, and data variations)",
+        "Spike stories: timeboxed research, prototyping, and de-risking unknowns"
+      ]
+    },
+    {
+      "name": "Prioritization & Value Ordering",
+      "aspects": [
+        "Weighted Shortest Job First (WSJF) and Cost of Delay calculations",
+        "MoSCoW method (Must Have, Should Have, Could Have, Won't Have) calibration",
+        "Kano model analysis (differentiating delighters from basic expectations)",
+        "Value vs Effort / Complexity 2x2 matrix ranking",
+        "Handling stakeholder urgency vs verified customer and business ROI"
+      ]
+    },
+    {
+      "name": "Backlog Refinement & Estimation",
+      "aspects": [
+        "Establishing an effective refinement cadence (e.g. 5-10% of sprint capacity)",
+        "Relative sizing (Story Points, T-shirt sizing) vs No-Estimates throughput forecasting",
+        "Asynchronous and distributed Planning Poker practices",
+        "Definition of Ready (DoR): balance between clarity and over-specification",
+        "Pre-Sprint Planning story readiness review and dependency unblocking"
+      ]
+    },
+    {
+      "name": "Technical Debt, Bugs & Quality Items",
+      "aspects": [
+        "Capacity allocation policies for tech debt and refactoring (e.g. 15-20% budget)",
+        "Defect triage workflows: classifying critical hotfixes vs backlog bugs",
+        "Documenting Non-Functional Requirements (NFRs: security, scale, performance)",
+        "Feature deprecation and tech sunset backlog items",
+        "Architectural Runway items for enabling future feature delivery"
+      ]
+    },
+    {
+      "name": "Stakeholder & Roadmap Alignment",
+      "aspects": [
+        "Connecting strategic Product Roadmap themes to individual backlog epics",
+        "Managing unscheduled 'drive-by' stakeholder requests without sprint disruption",
+        "Closing the loop: feeding customer interviews and product analytics into backlog",
+        "Backlog transparency and visibility radiators (Jira, Linear, physical boards)",
+        "Release planning: milestone forecasting and minimum viable release scope"
+      ]
+    },
+    {
+      "name": "Backlog Hygiene & Pruning",
+      "aspects": [
+        "Tackling backlog bloat: automated aging thresholds and archival policies",
+        "Pruning stale ideas: respectfully closing items older than 3 to 6 months",
+        "Maintaining optimal backlog depth (typically 2 to 3 sprints of refined work)",
+        "Aligning Acceptance Criteria with the Definition of Done (DoD)",
+        "Translating Sprint Retrospective improvement experiments into backlog items"
+      ]
+    },
+    {
+      "name": "Flow, Metrics & Forecasting",
+      "aspects": [
+        "Cycle Time and Lead Time tracking from 'Idea' to 'Production'",
+        "Cumulative Flow Diagrams (CFD) to identify bottlenecks in refinement stages",
+        "Monte Carlo simulation models for probabilistic delivery forecasting",
+        "Work-in-Progress (WIP) limits for items in backlog refinement",
+        "Value Stream Mapping to eliminate handoff delays in backlog readiness"
+      ]
+    }
+  ]
+}
