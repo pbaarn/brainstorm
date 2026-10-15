@@ -1,0 +1,42 @@
+{
+  "title": "Autonomous Coding Agent Architecture",
+  "description": "Deconstructing core components, memory systems, safety guardrails, and evaluation harnesses for agentic coding assistants.",
+  "categories": [
+    {
+      "name": "Context & Workspace Management",
+      "aspects": [
+        "Dynamic token budgeting and prompt compression strategies",
+        "AST-based code slicing for targeted context injection",
+        "Filesystem diff representation and patch conflict resolution",
+        "Incremental symbol indexing for multi-repo search"
+      ]
+    },
+    {
+      "name": "Execution & Tool Sandboxing",
+      "aspects": [
+        "Lightweight containerization vs micro-VM execution boundaries",
+        "Process timeout handling and runaway loop detection",
+        "Standard stream (stdout/stderr) buffering and truncation policies",
+        "Network isolation and whitelist security policies"
+      ]
+    },
+    {
+      "name": "Planning & Self-Correction",
+      "aspects": [
+        "Sub-goal generation and step-level backtracking algorithms",
+        "Automated linter and test feedback loop integration",
+        "Self-consistency sampling and verification critics",
+        "Human-in-the-loop confirmation trigger thresholds"
+      ]
+    },
+    {
+      "name": "Memory & Continuous Learning",
+      "aspects": [
+        "Short-term conversational context roll-off",
+        "Long-term preference and architectural decision storage",
+        "Tool usage failure logging and automated few-shot adaptation",
+        "Project-specific rules and conventions discovery"
+      ]
+    }
+  ]
+}
