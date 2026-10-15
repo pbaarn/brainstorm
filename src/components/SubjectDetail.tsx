@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Subject, Category, Aspect } from '../types';
 import { CategorySection } from './CategorySection';
+import { AspectCard } from './AspectCard';
 import { calculateStats, downloadJsonFile, generateId } from '../services/storage';
 import {
   ArrowLeft,
-  Plus,
   Search,
   Download,
   Edit2,
@@ -13,6 +13,10 @@ import {
   Circle,
   FolderPlus,
   Layers,
+  LayoutGrid,
+  List,
+  Filter,
+  Folder,
 } from 'lucide-react';
 
 interface SubjectDetailProps {
@@ -32,6 +36,8 @@ export const SubjectDetail: React.FC<SubjectDetailProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>('all');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'cards'>('list');
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
 
@@ -77,7 +83,70 @@ export const SubjectDetail: React.FC<SubjectDetailProps> = ({
       categories: subject.categories.filter((c) => c.id !== categoryId),
       updatedAt: new Date().toISOString(),
     });
+    if (selectedCategoryId === categoryId) {
+      setSelectedCategoryId('all');
+    }
   };
+
+  // Handlers for updating/deleting an aspect directly from Card View
+  const handleUpdateAspectInCard = (categoryId: string, updatedAspect: Aspect) => {
+    onUpdateSubject({
+      ...subject,
+      categories: subject.categories.map((c) =>
+        c.id === categoryId
+          ? {
+              ...c,
+              aspects: c.aspects.map((a) => (a.id === updatedAspect.id ? updatedAspect : a)),
+            }
+          : c
+      ),
+      updatedAt: new Date().toISOString(),
+    });
+  };
+
+  const handleDeleteAspectInCard = (categoryId: string, aspectId: string) => {
+    onUpdateSubject({
+      ...subject,
+      categories: subject.categories.map((c) =>
+        c.id === categoryId
+          ? {
+              ...c,
+              aspects: c.aspects.filter((a) => a.id !== aspectId),
+            }
+          : c
+      ),
+      updatedAt: new Date().toISOString(),
+    });
+  };
+
+  // Visible categories for list view (filtered by selected category)
+  const visibleCategories = useMemo(() => {
+    return subject.categories.filter((cat) => {
+      if (selectedCategoryId !== 'all' && cat.id !== selectedCategoryId) {
+        return false;
+      }
+      return true;
+    });
+  }, [subject.categories, selectedCategoryId]);
+
+  // Aggregated aspects for card view (respecting status, search, and category filters)
+  const filteredAspectsForCards = useMemo(() => {
+    const list: { aspect: Aspect; categoryId: string; categoryName: string }[] = [];
+    for (const cat of subject.categories) {
+      if (selectedCategoryId !== 'all' && cat.id !== selectedCategoryId) continue;
+      for (const asp of cat.aspects) {
+        const matchesStatus = !filterStatus || filterStatus === 'all' || asp.status === filterStatus;
+        const matchesQuery =
+          !searchQuery ||
+          asp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (asp.notes && asp.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+        if (matchesStatus && matchesQuery) {
+          list.push({ aspect: asp, categoryId: cat.id, categoryName: cat.name });
+        }
+      }
+    }
+    return list;
+  }, [subject.categories, selectedCategoryId, filterStatus, searchQuery]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 animate-in fade-in duration-200">
@@ -93,6 +162,36 @@ export const SubjectDetail: React.FC<SubjectDetailProps> = ({
         </button>
 
         <div className="flex items-center gap-2">
+          {/* View Mode Switcher: List vs Cards */}
+          <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              title="List View with Category headers"
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'list'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>List View</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('cards')}
+              title="Card View for high-level overview"
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'cards'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Card View</span>
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={() => onEditSubjectMeta(subject)}
@@ -200,87 +299,138 @@ export const SubjectDetail: React.FC<SubjectDetailProps> = ({
         </div>
       </div>
 
-      {/* Control Strip: Search & Filter Tabs & Add Category */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-          <button
-            type="button"
-            onClick={() => setFilterStatus('all')}
-            className={`px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
-              filterStatus === 'all'
-                ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-            }`}
-          >
-            All Aspects ({stats.total})
-          </button>
+      {/* Control Strip: Status Filters & Category Selector & Search */}
+      <div className="space-y-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
+        {/* Row 1: Status Filter Pills + Search + Add Category */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          {/* Status Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setFilterStatus('all')}
+              className={`px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
+                filterStatus === 'all'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              All Aspects ({stats.total})
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setFilterStatus('in_progress')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
-              filterStatus === 'in_progress'
-                ? 'bg-amber-500 text-white shadow-2xs'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-            }`}
-          >
-            <Clock className="w-3.5 h-3.5" />
-            <span>In Progress ({stats.inProgress})</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('in_progress')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
+                filterStatus === 'in_progress'
+                  ? 'bg-amber-500 text-white shadow-2xs'
+                  : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>In Progress ({stats.inProgress})</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setFilterStatus('done')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
-              filterStatus === 'done'
-                ? 'bg-emerald-600 text-white shadow-2xs'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-            }`}
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Done ({stats.done})</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('done')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
+                filterStatus === 'done'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Done ({stats.done})</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setFilterStatus('not_started')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
-              filterStatus === 'not_started'
-                ? 'bg-slate-700 text-white shadow-2xs'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-            }`}
-          >
-            <Circle className="w-3.5 h-3.5" />
-            <span>Not Started ({stats.notStarted})</span>
-          </button>
-        </div>
-
-        {/* Right side: Search within subject & Add Category */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 md:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter aspects & notes..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 shadow-2xs"
-            />
+            <button
+              type="button"
+              onClick={() => setFilterStatus('not_started')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
+                filterStatus === 'not_started'
+                  ? 'bg-slate-700 text-white shadow-2xs'
+                  : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              <Circle className="w-3.5 h-3.5" />
+              <span>Not Started ({stats.notStarted})</span>
+            </button>
           </div>
 
+          {/* Right side: Search & Add Category */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 md:w-64">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search aspects & notes..."
+                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 shadow-2xs"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsAddingCategory(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-semibold shadow-xs transition-colors shrink-0"
+            >
+              <FolderPlus className="w-4 h-4" />
+              <span>Add Category</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Row 2: Category Filter Selector (Chips/Bar) */}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto text-xs pb-1">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 shrink-0 mr-1">
+            <Filter className="w-3 h-3" />
+            Category:
+          </span>
+
           <button
             type="button"
-            onClick={() => setIsAddingCategory(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-semibold shadow-xs transition-colors shrink-0"
+            onClick={() => setSelectedCategoryId('all')}
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+              selectedCategoryId === 'all'
+                ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
           >
-            <FolderPlus className="w-4 h-4" />
-            <span>Add Category</span>
+            All Categories ({subject.categories.length})
           </button>
+
+          {subject.categories.map((cat) => {
+            const isSelected = selectedCategoryId === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setSelectedCategoryId(isSelected ? 'all' : cat.id)}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 ${
+                  isSelected
+                    ? 'bg-indigo-600 text-white font-semibold shadow-2xs'
+                    : 'bg-slate-100/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                <Folder className="w-3 h-3 opacity-70" />
+                <span>{cat.name}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                    isSelected
+                      ? 'bg-indigo-700 text-white'
+                      : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  {cat.aspects.length}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Add Category Form Modal / Banner */}
+      {/* Add Category Form Banner */}
       {isAddingCategory && (
         <form
           onSubmit={handleAddCategory}
@@ -314,38 +464,77 @@ export const SubjectDetail: React.FC<SubjectDetailProps> = ({
         </form>
       )}
 
-      {/* Categories List */}
-      {subject.categories.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 p-8 space-y-3">
-          <Layers className="w-8 h-8 text-slate-400 mx-auto" />
-          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-            No categories defined yet
-          </p>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
-            Organize this subject by creating categories to group related aspects.
-          </p>
-          <button
-            type="button"
-            onClick={() => setIsAddingCategory(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 shadow-xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create First Category</span>
-          </button>
+      {/* Aspects Display: List View vs Card View */}
+      {viewMode === 'cards' ? (
+        // CARD VIEW: No category headers, category shown on each card
+        <div>
+          {filteredAspectsForCards.length === 0 ? (
+            <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 p-8 space-y-3">
+              <Layers className="w-8 h-8 text-slate-400 mx-auto" />
+              <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                No aspects match your filters
+              </p>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Try switching the category, clearing the search query, or showing all aspect statuses.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setFilterStatus('all');
+                  setSelectedCategoryId('all');
+                  setSearchQuery('');
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-colors"
+              >
+                Reset All Filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in fade-in duration-150">
+              {filteredAspectsForCards.map(({ aspect, categoryId, categoryName }) => (
+                <AspectCard
+                  key={aspect.id}
+                  aspect={aspect}
+                  categoryId={categoryId}
+                  categoryName={categoryName}
+                  onUpdate={handleUpdateAspectInCard}
+                  onDelete={handleDeleteAspectInCard}
+                  onOpenNotes={onOpenNotes}
+                />
+              ))}
+            </div>
+          )}
         </div>
       ) : (
+        // LIST VIEW: Categories with headers (only shown if aspects match filter)
         <div className="space-y-4">
-          {subject.categories.map((category) => (
-            <CategorySection
-              key={category.id}
-              category={category}
-              filterStatus={filterStatus}
-              searchQuery={searchQuery}
-              onUpdateCategory={handleUpdateCategory}
-              onDeleteCategory={handleDeleteCategory}
-              onOpenNotes={onOpenNotes}
-            />
-          ))}
+          {visibleCategories.length === 0 ? (
+            <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 p-8 space-y-3">
+              <Layers className="w-8 h-8 text-slate-400 mx-auto" />
+              <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                No categories match the filter
+              </p>
+              <button
+                type="button"
+                onClick={() => setSelectedCategoryId('all')}
+                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+              >
+                Show all categories
+              </button>
+            </div>
+          ) : (
+            visibleCategories.map((category) => (
+              <CategorySection
+                key={category.id}
+                category={category}
+                filterStatus={filterStatus}
+                searchQuery={searchQuery}
+                onUpdateCategory={handleUpdateCategory}
+                onDeleteCategory={handleDeleteCategory}
+                onOpenNotes={onOpenNotes}
+              />
+            ))
+          )}
         </div>
       )}
     </div>

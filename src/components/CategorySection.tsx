@@ -42,6 +42,13 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
     return matchesStatus && matchesQuery;
   });
 
+  const isFiltering = Boolean((filterStatus && filterStatus !== 'all') || (searchQuery && searchQuery.trim().length > 0));
+
+  // Only show the category header if any of the aspects are in the filter result
+  if (filteredAspects.length === 0 && (category.aspects.length > 0 || isFiltering)) {
+    return null;
+  }
+
   const handleSaveName = () => {
     const trimmed = nameInput.trim();
     if (trimmed && trimmed !== category.name) {
